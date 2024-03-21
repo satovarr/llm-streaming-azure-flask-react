@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #result {
+        white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+      }
+    </style>
+  </head>
+<body>
+  <div>
+    <p id="result"></p>
+  </div>
+  <script>
+  const source = new EventSource("http://127.0.0.1:8000/stream-chat");
+  const result = document.getElementById("result");
+    source.onmessage = function(event) {
+        if (event.data === "CLOSE") {
+            source.close();
+            return;
+        };
+        if (event.data === "") {
+            result.innerText += " ";
+        } else {
+          result.innerText += event.data;
+        }
+    };
+
+  
+  </script>
+</body>
+</html>
