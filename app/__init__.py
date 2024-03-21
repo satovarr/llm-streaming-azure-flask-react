@@ -19,7 +19,7 @@ def stream_chat():
     start_time = time.time()
     def generate():
         completion = answer_general_question(
-            question="Can you please gie me a brief history of the United States?",
+            question="Can you please give me a brief history of the United States?",
             context=get_mocked_context(),
             streaming=True
         )
@@ -40,7 +40,7 @@ def generate_mock():
         yield f"data: {token}\n\n"
     yield "data: [DONE]\n\n"
 
-@app.route('/stream')
+@app.route('/stream-example')
 def stream():
     return Response(generate_mock(), mimetype='text/event-stream')
 

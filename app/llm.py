@@ -99,7 +99,7 @@ def answer_general_question(question, context, streaming: bool):
         open_api_version="2023-07-01-preview",
         open_api_key=config["OPENAI_API_KEY"],
         azure_endpoint=config["AZURE_ENDPOINT"],
-        deployment_name="bairesdev-gpt-35-turbo",
+        deployment_name=config["CONFIG_DEPLOYMENT_NAME"],
         model="gpt-35-turbo",
         temperature=0,
         question=question,
