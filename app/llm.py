@@ -37,8 +37,8 @@ class LLMModel:
         return llm_instance
 
     def call_llm(self, messages: list):
-        response = self.create().invoke(messages)
-        return response.content
+        response = self.create().stream(messages)
+        return response
 
 
 class GeneralChatConversation(LLMModel):

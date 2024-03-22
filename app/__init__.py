@@ -18,14 +18,12 @@ def store_message(message: str):
 def stream_chat():
     start_time = time.time()
     def generate():
-        completion = answer_general_question(
+        for message in answer_general_question(
             question="Can you please give me a brief history of the United States?",
             context=get_mocked_context(),
             streaming=True
-        )
-        for message in completion:
-            yield f"data:{message}\n\n"
-            print(f"message: {message}. compleion length: {len(completion)}")
+        ):
+            yield f"data:{message.content}\n\n"
         # store_message(completion)
         print(f"Time taken: {time.time() - start_time}")
         yield "data: CLOSE\n\n"
