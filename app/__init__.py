@@ -1,6 +1,6 @@
 from flask import Flask, Response
 from flask_cors import CORS, cross_origin
-from app.llm import answer_general_question, get_mocked_context
+from app.llm import answer_general_question, get_mocked_context, answer_dqa_question
 import time
 
 app = Flask(__name__)
@@ -10,7 +10,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 def store_message(message: str):
-    print(f"\nmessage: {message} \nStored")
+    print(f"\nmessage: {message[:15]} \nStored")
 
 
 @app.route("/stream-chat")
@@ -18,18 +18,41 @@ def store_message(message: str):
 def stream_chat():
     start_time = time.time()
     def generate():
-        for message in answer_general_question(
+        completion = answer_general_question(
             question="Can you please give me a brief history of the United States?",
             context=get_mocked_context(),
             streaming=True
-        ):
-            yield f"data:{message.content}\n\n"
-        # store_message(completion)
+        )
+        message = ""
+        for chunk in completion:
+            message += chunk.content
+            yield f"data:{chunk.content}\n\n"
+        store_message(message)
         print(f"Time taken: {time.time() - start_time}")
         yield "data: CLOSE\n\n"
 
     return Response(generate(), content_type="text/event-stream")
 
+
+@app.route('/stream-dqa')
+def stream_dqa():
+    start_time = time.time()
+    def generate():
+        completion, metadata = answer_dqa_question(
+            question="What is the capital of France?",
+            context=get_mocked_context(),
+            streaming=True
+        )
+        yield f"data: {metadata}\n\n"
+        message = ""
+        for chunk in completion:
+            message += chunk.content
+            yield f"data:{chunk.content}\n\n"
+        store_message(message)
+        print(f"Time taken: {time.time() - start_time}")
+        yield "data: CLOSE\n\n"
+
+    return Response(generate(), content_type="text/event-stream")
 
 def generate_mock():
     tokens = "Hello, this is a mocked chatbot. How can I help you?".split(" ")
