@@ -38,16 +38,16 @@ def stream_chat():
 def stream_dqa():
     start_time = time.time()
     def generate():
-        completion, metadata = answer_dqa_question(
-            question="What is the capital of France?",
+        completion, retriever = answer_dqa_question(
+            question="What can I ask about?",
             context=get_mocked_context(),
             streaming=True
         )
-        yield f"data: {metadata}\n\n"
         message = ""
         for chunk in completion:
-            message += chunk.content
-            yield f"data:{chunk.content}\n\n"
+            message += chunk
+            yield f"data:{chunk}\n\n"
+        yield f"data: {retriever.metadata_storage}\n\n"
         store_message(message)
         print(f"Time taken: {time.time() - start_time}")
         yield "data: CLOSE\n\n"

@@ -6,7 +6,9 @@ from typing import List
 
 
 class CustomRetriever(AzureCognitiveSearchRetriever):
-    
+    metadata_ready = False
+    metadata_storage = []
+
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
     ) -> List[Document]:
@@ -15,6 +17,7 @@ class CustomRetriever(AzureCognitiveSearchRetriever):
             Document(page_content=result.pop(self.content_key), metadata=result)
             for result in search_results
         ]
+        self.metadata_ready = True
         return self.metadata_storage
     
     async def _aget_relevant_documents(
@@ -27,10 +30,4 @@ class CustomRetriever(AzureCognitiveSearchRetriever):
         ]
         return self.metadata_storage
 
-    @property
-    def metadata_storage(self):
-        return self._metadata_storage
-    
-    @metadata_storage.setter
-    def metadata_storage(self, value):
-        self._metadata_storage = value
+   

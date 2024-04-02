@@ -26,7 +26,7 @@ from azure.search.documents.indexes.models import (
 from dotenv import dotenv_values
 import os
 import uuid
-
+import time
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.formrecognizer import DocumentAnalysisClient
 
@@ -291,7 +291,8 @@ class DQAConversation(LLMModel):
         self.context = context
         self.metadata_storage = []
         self.retriever = CustomRetriever(
-        content_key="page_text", top_k=5
+            metadata_storage=self.metadata_storage, 
+            content_key="page_text", top_k=5
     )
         self.retriever.metadata_storage = self.metadata_storage
 
@@ -338,9 +339,9 @@ class DQAConversation(LLMModel):
         )
         return chain
 
-    def call_llm(self, messages: list) -> tuple[Iterator[BaseMessageChunk], list]:
-        response = self.get_langchain_pipeline.stream(messages)
-        return response, self.metadata_storage
+    def call_llm(self, messages: list): 
+        response = self.get_langchain_pipeline().stream({"question": self.question})
+        return response
 
 
 
@@ -374,5 +375,5 @@ def answer_dqa_question(question, context, streaming: bool):
         context=context,
         streaming=streaming,
     )
-    answer, metadata_storage = llm_instance.call_llm(context)
-    return answer, metadata_storage
+    answer = llm_instance.call_llm(context)
+    return answer, llm_instance.retriever
