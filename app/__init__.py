@@ -47,7 +47,7 @@ def stream_dqa():
         for chunk in completion:
             message += chunk
             yield f"data:{chunk}\n\n"
-        yield f"data: {retriever.metadata_storage}\n\n"
+        yield f"metadata: {retriever.metadata_storage}\n\n"
         store_message(message)
         print(f"Time taken: {time.time() - start_time}")
         yield "data: CLOSE\n\n"

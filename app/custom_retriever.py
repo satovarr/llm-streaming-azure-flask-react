@@ -17,17 +17,7 @@ class CustomRetriever(AzureCognitiveSearchRetriever):
             Document(page_content=result.pop(self.content_key), metadata=result)
             for result in search_results
         ]
-        self.metadata_ready = True
         return self.metadata_storage
     
-    async def _aget_relevant_documents(
-        self, query: str, *, run_manager: AsyncCallbackManagerForRetrieverRun
-    ) -> List[Document]:
-        search_results = await self._asearch(query)
-        self.metadata_storage = [
-            Document(page_content=result.pop(self.content_key), metadata=result)
-            for result in search_results
-        ]
-        return self.metadata_storage
-
+    
    
